@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc" Version="10.0.0" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OptimalCoder.Blueprint.DB.Migrations\OptimalCoder.Blueprint.DB.Migrations.csproj" />
+    <ProjectReference Include="..\OptimalCoder.Blueprint.DB\OptimalCoder.Blueprint.DB.csproj" />
+    <ProjectReference Include="..\OptimalCoder.Blueprint.Infrastructure\OptimalCoder.Blueprint.Infra.csproj" />
+    <ProjectReference Include="..\OptimalCoder.Blueprint.Services\OptimalCoder.Blueprint.Domain.csproj" />
+    <ProjectReference Include="..\OptimalCoder.Blueprint.Shared\OptimalCoder.Blueprint.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OptimalCoder.Blueprint.DB\OptimalCoder.Blueprint.DB.csproj" />
+    <ProjectReference Include="..\OptimalCoder.Blueprint.Shared\OptimalCoder.Blueprint.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
