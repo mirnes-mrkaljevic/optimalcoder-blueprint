@@ -5,13 +5,17 @@ namespace OptimalCoder.Blueprint.DB.Context
 {
     public class UserDbContext : DbContext
     {
+        public UserDbContext(): base()
+        {
+
+        }
         public UserDbContext(DbContextOptions<UserDbContext> options)
        : base(options)
-        {
+        { 
         }
 
-        public DbSet<User> User { get; set; }
-        public DbSet<Role> Role { get; set; }
+        public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

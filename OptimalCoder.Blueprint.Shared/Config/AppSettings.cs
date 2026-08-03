@@ -2,14 +2,14 @@
 {
     public class AppSettings
     {
-        public required ConnectionStrings ConnectionStrings { get; set; }
-        public required LoggerAppSettings Logging { get; set; }
+        public ConnectionStrings? ConnectionStrings { get; set; }
+        public LoggerAppSettings? Logging { get; set; }
 
-        public required Jwt Jwt { get; set; }
+        public Jwt? Jwt { get; set; }
     }
 
     public class ConnectionStrings
     {
-        public required string DefaultConnection { get; set; }
+        public string? DefaultConnection { get; set; }
     }
 }

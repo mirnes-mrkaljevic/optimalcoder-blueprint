@@ -6,4 +6,5 @@
   <Project Path="OptimalCoder.Blueprint.Infrastructure/OptimalCoder.Blueprint.Infra.csproj" Id="c71fa0eb-19ba-439b-9a35-aa93935e35a3" />
   <Project Path="OptimalCoder.Blueprint.Services/OptimalCoder.Blueprint.Domain.csproj" />
   <Project Path="OptimalCoder.Blueprint.Shared/OptimalCoder.Blueprint.Shared.csproj" Id="14758e56-ffb1-4d62-b3c0-ee4c09704715" />
+  <Project Path="OptimalCoder.Blueprint.Tests/OptimalCoder.Blueprint.Tests.csproj" Id="b668d82b-688a-4f13-bf8f-ade88c1caec7" />
 </Solution>
