@@ -1,6 +1,5 @@
-﻿using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
+﻿using Asp.Versioning.ApiExplorer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -37,6 +36,24 @@ namespace OptimalCoder.Blueprint.API.Versioning
 
             });
 
+            options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, CreateAuthScheme());
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme, document)] = []
+            });
+
+        }
+
+        private static OpenApiSecurityScheme CreateAuthScheme()
+        {
+            return new OpenApiSecurityScheme()
+            {
+                Name = "JWT Bearer Token",
+                Type = SecuritySchemeType.Http,
+                Scheme = JwtBearerDefaults.AuthenticationScheme,
+                BearerFormat = "JWT",
+                Description = "JWT Bearer Authorization",
+            };
         }
     }
 }

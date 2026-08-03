@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using OptimalCoder.Blueprint.Shared.Config;
+using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
 

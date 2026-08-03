@@ -1,7 +1,8 @@
-﻿using OptimalCoder.Blueprint.API.Validation;
+﻿using FluentValidation;
+using OptimalCoder.Blueprint.API.Validation;
+using OptimalCoder.Blueprint.IAM.Authentication;
 using OptimalCoder.Blueprint.Infra.Logger;
 using OptimalCoder.Blueprint.Shared.Exceptions;
-using System.Net;
 
 namespace OptimalCoder.Blueprint.API.Exceptions
 {
@@ -31,20 +32,24 @@ namespace OptimalCoder.Blueprint.API.Exceptions
         {
             var response = ex switch
             {
-                ValidationException => CreateErrorResponse(
+                ValidationException validationEx => CreateErrorResponse(
                     StatusCodes.Status400BadRequest,
+                    "VALIDATION_FAILED",
                     ex.Message),
 
                 NotFoundException => CreateErrorResponse(
                     StatusCodes.Status404NotFound,
+                     "NOT_FOUND",
                     ex.Message),
 
-                UnauthorizedAccessException => CreateErrorResponse(
+                UnauthorizedException unauthorizedEx => CreateErrorResponse(
                     StatusCodes.Status401Unauthorized,
+                    unauthorizedEx.Code,
                     ex.Message),
 
                 _ => CreateErrorResponse(
                     StatusCodes.Status500InternalServerError,
+                    "INTERNAL_ERROR",
                     "An unexpected error occurred.")
             };
 
@@ -56,12 +61,14 @@ namespace OptimalCoder.Blueprint.API.Exceptions
 
         private static ErrorResponse CreateErrorResponse(
         int status,
+        string code,
         string message)
         {
             return new ErrorResponse
             {
                 Status = status,
                 Success = false,
+                Code = code,
                 Message = message
         
             };

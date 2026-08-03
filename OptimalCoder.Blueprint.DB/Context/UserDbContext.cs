@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OptimalCoder.Blueprint.DB.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OptimalCoder.Blueprint.DB.Context
 {
@@ -13,21 +10,27 @@ namespace OptimalCoder.Blueprint.DB.Context
         {
         }
 
-        public bool UpdateTokens(int userId, string authToken, string refreshToken, DateTime refreshTokenExpiryTime)
-        {
-            User.Update(new User()
-            {
-                Id = userId,
-                AuthToken = authToken,
-                RefreshToken = refreshToken,
-                RefreshTokenExpiryTime = refreshTokenExpiryTime
-            });
+        public DbSet<User> User { get; set; }
+        public DbSet<Role> Role { get; set; }
 
-            return SaveChanges() == 1;
-                
- 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                 .HasMany(u => u.Roles)
+                 .WithMany(r => r.Users)
+                 .UsingEntity<Dictionary<string, object>>(
+                     "UserRole",
+                     right => right.HasOne<Role>()
+                                   .WithMany()
+                                   .HasForeignKey("RoleId"),
+                     left => left.HasOne<User>()
+                                 .WithMany()
+                                 .HasForeignKey("UserId"),
+                     join =>
+                     {
+                         join.HasKey("UserId", "RoleId");
+                     });
         }
 
-        public DbSet<User> User { get; set; }
     }
 }

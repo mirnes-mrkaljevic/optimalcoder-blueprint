@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using OptimalCoder.Blueprint.Shared.Config;
 
 namespace OptimalCoder.Blueprint.Infra.Logger
 {
@@ -16,7 +17,7 @@ namespace OptimalCoder.Blueprint.Infra.Logger
     {
 
         private Serilog.ILogger _logger;
-        public OptimalLogger(IOptionsSnapshot<AppSettings> appSettings)
+        public OptimalLogger(IOptions<AppSettings> appSettings)
         {
             _logger = LoggerBuilder.Build(appSettings.Value);
         }
@@ -28,11 +29,6 @@ namespace OptimalCoder.Blueprint.Infra.Logger
         public void Debug(string message)
         {
             _logger.Debug(message);
-        }
-
-        public void Dispose()
-        {
-            
         }
 
         public void Error(string message)
@@ -59,5 +55,11 @@ namespace OptimalCoder.Blueprint.Infra.Logger
         {
             _logger.Warning(message);
         }
+        public void Dispose()
+        {
+            ((IDisposable)_logger).Dispose();
+            Console.WriteLine("DIsposed");
+        }
+
     }
 }

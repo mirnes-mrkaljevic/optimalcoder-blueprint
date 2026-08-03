@@ -3,11 +3,12 @@ using Microsoft.Extensions.Logging;
 
 namespace OptimalCoder.Blueprint.Infra.Logger
 {
-    public static class LoggingBuilderExtensions
+    public static class LoggerExtensions
     {
         public static IServiceCollection AddOptimalLogger(this ILoggingBuilder logBuilder)
         {
-            return logBuilder.Services.AddScoped<IOptimalLogger, OptimalLogger>();
+            return logBuilder.Services.AddSingleton<IOptimalLogger, OptimalLogger>();
         }
+
     }
 }

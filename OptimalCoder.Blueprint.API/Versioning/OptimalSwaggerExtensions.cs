@@ -23,8 +23,9 @@ namespace OptimalCoder.Blueprint.API.Versioning
                 options.SubstituteApiVersionInUrl = true;
                 options.GroupNameFormat = "'v'VVV";
             });
-
             
+
+
 
             return services;
         }

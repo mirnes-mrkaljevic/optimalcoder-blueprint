@@ -14,7 +14,7 @@ namespace OptimalCoder.Blueprint.DB.Migrations
         {
             
             Insert.IntoTable("User")
-                .Row(new { UserName = "admin", PasswordHash = "oxacSrneM84z6vzk3QBUOgyFVjofFU43HU+JK3VopCo=", PasswordSalt = "I7k67xQ/y2HqsEMIuB95zA==", EmailConfirmed = true, Locked = false });
+                .Row(new { UserName = "optimalcoderadmin", PasswordHash = "gmDSu/JzrE9nMA40AtMfAwAJ59CcWV6i7fX0TEy7fj0=", PasswordSalt = "I7k67xQ/y2HqsEMIuB95zA==", EmailConfirmed = true, Locked = false });
             Insert.IntoTable("Role").Row(new { Name = "Admin" });
 
 
