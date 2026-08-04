@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using OptimalCoder.Blueprint.API.Validation;
 using OptimalCoder.Blueprint.IAM.Authentication;
 using OptimalCoder.Blueprint.Infra.Logger;
 using OptimalCoder.Blueprint.Shared.Exceptions;

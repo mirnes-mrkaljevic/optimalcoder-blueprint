@@ -58,7 +58,6 @@ namespace OptimalCoder.Blueprint.Infra.Logger
         public void Dispose()
         {
             ((IDisposable)_logger).Dispose();
-            Console.WriteLine("DIsposed");
         }
 
     }

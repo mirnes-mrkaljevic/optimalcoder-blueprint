@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OptimalCoder.Blueprint.API\OptimalCoder.Blueprint.API.csproj" />
     <ProjectReference Include="..\OptimalCoder.Blueprint.DB\OptimalCoder.Blueprint.DB.csproj" />
     <ProjectReference Include="..\OptimalCoder.Blueprint.IAM\OptimalCoder.Blueprint.IAM.csproj" />
   </ItemGroup>
