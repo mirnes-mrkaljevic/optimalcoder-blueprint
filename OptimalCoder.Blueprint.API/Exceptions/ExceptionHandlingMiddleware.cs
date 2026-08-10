@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Http.HttpResults;
 using OptimalCoder.Blueprint.IAM.Authentication;
 using OptimalCoder.Blueprint.Infra.Logger;
 using OptimalCoder.Blueprint.Shared.Exceptions;
+using Serilog.Core;
 
 namespace OptimalCoder.Blueprint.API.Exceptions
 {
@@ -22,46 +24,41 @@ namespace OptimalCoder.Blueprint.API.Exceptions
             }
             catch (Exception ex)
             {
-                logger.Error(ex, ex.Message);
-                await HandleExceptionAsync(httpContext, ex);
+                await HandleExceptionAsync(httpContext, logger, ex);
             }
         }
 
-        private async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        private async Task HandleExceptionAsync(HttpContext context, IOptimalLogger logger, Exception ex)
         {
-            var response = ex switch
+            ErrorResponse response;
+
+            switch (ex)
             {
-                ValidationException validationEx => CreateErrorResponse(
-                    StatusCodes.Status400BadRequest,
-                    "VALIDATION_FAILED",
-                    ex.Message),
+                case ValidationException validationEx:
+                    response = CreateErrorResponse(StatusCodes.Status400BadRequest, "VALIDATION_FAILED", ex.Message);
+                    break;
 
-                NotFoundException => CreateErrorResponse(
-                    StatusCodes.Status404NotFound,
-                     "NOT_FOUND",
-                    ex.Message),
+                case NotFoundException notFoundEx:
+                    logger.Error(notFoundEx, notFoundEx.Message);
+                    response = CreateErrorResponse(StatusCodes.Status404NotFound, "NOT_FOUND", ex.Message);
+                    break;
+                case UnauthorizedException unauthorizedEx:
+                    response = CreateErrorResponse(StatusCodes.Status401Unauthorized, unauthorizedEx.Code, ex.Message);
+                    break;
+                default:
+                    logger.Error(ex, ex.Message);
+                    response = CreateErrorResponse(StatusCodes.Status500InternalServerError, "INTERNAL_ERROR", "An unexpected error occurred.");
+                    break;
 
-                UnauthorizedException unauthorizedEx => CreateErrorResponse(
-                    StatusCodes.Status401Unauthorized,
-                    unauthorizedEx.Code,
-                    ex.Message),
-
-                _ => CreateErrorResponse(
-                    StatusCodes.Status500InternalServerError,
-                    "INTERNAL_ERROR",
-                    "An unexpected error occurred.")
-            };
-
+            }
+           
             context.Response.StatusCode = response.Status;
             context.Response.ContentType = "application/json";
 
             await context.Response.WriteAsJsonAsync(response);
         }
 
-        private static ErrorResponse CreateErrorResponse(
-        int status,
-        string code,
-        string message)
+        private static ErrorResponse CreateErrorResponse(int status, string code, string message)
         {
             return new ErrorResponse
             {
