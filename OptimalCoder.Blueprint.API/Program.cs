@@ -33,7 +33,6 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-app.UseRateLimiter();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.Services.RunPendingOptimalMigrations();
@@ -48,6 +47,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 

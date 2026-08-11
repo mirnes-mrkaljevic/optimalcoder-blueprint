@@ -1,12 +1,16 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.Extensions.Options;
 using Moq;
 using Moq.EntityFrameworkCore;
 using NUnit.Framework;
 using OptimalCoder.Blueprint.DB.Context;
 using OptimalCoder.Blueprint.DB.Entities;
 using OptimalCoder.Blueprint.IAM.Authentication;
+using OptimalCoder.Blueprint.IAM.Authentication.Model;
 using OptimalCoder.Blueprint.Shared.Config;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
 {
@@ -16,6 +20,7 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
         private AuthenticationService _authService;
         private User _user;
         private Mock<UserDbContext> _userContextMock;
+        private Mock<IPasswordService> _passwordServiceMock;
 
         private readonly IOptions<AppSettings> _appSettings = Options.Create(new AppSettings()
         {
@@ -37,10 +42,8 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
                 Id = 1,
                 EmailConfirmed = true,
                 Locked = false,
-                AuthToken = "testauthtoken",
+                RefreshTokenHash = "RefreshTokenHash",
                 PasswordHash = "PasswordHash",
-                PasswordSalt = "PasswordSalt",
-                RefreshToken = "RefreshToken",
                 UserName = "UserName",
                 RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(1),
                 Roles = new List<Role>() { new Role()
@@ -51,7 +54,9 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
             };
             _userContextMock = new Mock<UserDbContext>();
             _userContextMock.SetupGet(x => x.User).ReturnsDbSet([ _user ]);
-            _authService = new AuthenticationService(_userContextMock.Object, _appSettings);
+
+            _passwordServiceMock = new Mock<IPasswordService>();
+            _authService = new AuthenticationService(_userContextMock.Object, _passwordServiceMock.Object, _appSettings);
         }
 
         [Test]
@@ -71,22 +76,23 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
         [Test]
         public void Login_WhenDifferentPasswordHash_ThrowEx()
         {
+            _passwordServiceMock.Setup(x => x.Hash(_user, "password")).Returns("wrong password hash");
+
             var ex = Assert.Throws<UnauthorizedException>(() => _authService.Login(new UserLoginModel()
             {
-                UserName = "UserName",
+                UserName = _user.UserName,
                 Password = "password"
             }))!;
-            Assert.AreEqual("WRONG_PASSWORD", ex.Code);
+            Assert.AreEqual("INVALID_CREDENTIALS", ex.Code);
         }
 
         [Test]
         public void RefreshAuthToken_WhenExpired_ThrowEx()
         {
             _user.RefreshTokenExpiryTime = DateTime.UtcNow.AddSeconds(-1);
-            var ex = Assert.Throws<UnauthorizedException>(() => _authService.RefreshAuthToken(new TokenModel()
+            var ex = Assert.Throws<UnauthorizedException>(() => _authService.RefreshToken(new TokenRequest()
             {
-                AuthToken = _user.AuthToken,
-                RefreshToken = _user.RefreshToken
+                RefreshToken = "refresh token"
             }))!;
             Assert.AreEqual("REFRESH_TOKEN_FAILED", ex.Code);
         }
@@ -94,10 +100,13 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
         [Test]
         public void RefreshAuthToken_WhenSucess_ToReturnNewToken()
         {
-           var newToken =  _authService.RefreshAuthToken(new TokenModel()
+            var refreshToken = "refreshToken";
+            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
+            _user.RefreshTokenHash = Convert.ToBase64String(hash);
+
+            var newToken =  _authService.RefreshToken(new TokenRequest()
             {
-                AuthToken = _user.AuthToken,
-                RefreshToken = _user.RefreshToken
+                RefreshToken = refreshToken
             });
 
             bool isJwt = new JwtSecurityTokenHandler().CanReadToken(newToken.AuthToken);
@@ -108,10 +117,13 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
         [Test]
         public void Logout_WhenSucess_ToReturnTrue()
         {
-            var result = _authService.Logout(new TokenModel()
+            var refreshToken = "refreshToken";
+            var hash = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
+            _user.RefreshTokenHash = Convert.ToBase64String(hash);
+
+            var result = _authService.Logout(_user.UserName, new TokenRequest()
             {
-                AuthToken = _user.AuthToken,
-                RefreshToken = _user.RefreshToken
+                RefreshToken = refreshToken
             });
 
             Assert.IsTrue(result);

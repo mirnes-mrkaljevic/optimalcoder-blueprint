@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OptimalCoder.Blueprint.DB.Entities;
 using OptimalCoder.Blueprint.IAM.Authentication;
+using OptimalCoder.Blueprint.IAM.Authentication.Model;
 
 namespace OptimalCoder.Blueprint.API.Controllers
 {
@@ -13,8 +14,8 @@ namespace OptimalCoder.Blueprint.API.Controllers
     {
         private readonly IAuthenticationService _service;
         private readonly IValidator<UserLoginModel> _loginModelValidator;
-        private readonly IValidator<TokenModel> _tokenModelValidator;
-        public AuthenticationController(IAuthenticationService service, IValidator<UserLoginModel> loginModelValidator, IValidator<TokenModel> tokenModelValidator)
+        private readonly IValidator<TokenRequest> _tokenModelValidator;
+        public AuthenticationController(IAuthenticationService service, IValidator<UserLoginModel> loginModelValidator, IValidator<TokenRequest> tokenModelValidator)
         {
             _service = service;
             _loginModelValidator = loginModelValidator;
@@ -36,25 +37,25 @@ namespace OptimalCoder.Blueprint.API.Controllers
             return Ok(new { TokenModel = tokenModel });
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost("RefreshToken")]
-        public IActionResult RefreshToken([FromBody] TokenModel oldTokenModel)
+        public IActionResult RefreshToken([FromBody] TokenRequest request)
         {
+            var validation = _tokenModelValidator.Validate(request);
 
-            var validation = _tokenModelValidator.Validate(oldTokenModel);
             if (!validation.IsValid)
             {
                 throw new ValidationException(validation.Errors);
             }
 
-            oldTokenModel.AuthToken = Request.Headers.Authorization.ToString().Replace("Bearer", string.Empty).Trim();
-            var newTokenModel = _service.RefreshAuthToken(oldTokenModel);
-            return Ok(newTokenModel);
+            var tokenResponse = _service.RefreshToken(request);
+
+            return Ok(tokenResponse);
         }
 
         [Authorize]
         [HttpPost("Logout")]
-        public IActionResult Logout([FromBody] TokenModel tokenModel)
+        public IActionResult Logout([FromBody] TokenRequest tokenModel)
         {
             var validation = _tokenModelValidator.Validate(tokenModel);
             if (!validation.IsValid)
@@ -62,7 +63,8 @@ namespace OptimalCoder.Blueprint.API.Controllers
                 throw new ValidationException(validation.Errors);
             }
 
-            bool success = _service.Logout(tokenModel);
+            var success = _service.Logout(User.Identity?.Name!, tokenModel);
+
             return Ok(success);
         }
     }

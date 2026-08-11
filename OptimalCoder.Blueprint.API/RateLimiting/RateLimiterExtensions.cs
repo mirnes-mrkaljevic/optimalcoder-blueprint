@@ -8,19 +8,38 @@ namespace OptimalCoder.Blueprint.API.RateLimiting
         {
             services.AddRateLimiter(options =>
             {
-                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
-                    RateLimitPartition.GetFixedWindowLimiter(
-                        partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
-                        factory: partition => new FixedWindowRateLimiterOptions
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(
+                        httpContext =>
                         {
-                            AutoReplenishment = true,
-                            PermitLimit = 10,
-                            QueueLimit = 0,
-                            Window = TimeSpan.FromMinutes(1)
-                        }));
+                            var partitionKey = GetPartitionKey(httpContext);
+
+                            return RateLimitPartition.GetFixedWindowLimiter(
+                                    partitionKey,
+                                    _ => new FixedWindowRateLimiterOptions
+                                    {
+                                        AutoReplenishment = true,
+                                        PermitLimit = 10,
+                                        QueueLimit = 0,
+                                        Window = TimeSpan.FromMinutes(1)
+                                    });
+                        });
+
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             });
 
             return services;
+        }
+
+        private static string GetPartitionKey(HttpContext context)
+        {
+            if (context.User.Identity?.IsAuthenticated == true)
+            {
+                return $"user:{context.User.Identity.Name}";
+            }
+
+            var ipAddress = context.Connection.RemoteIpAddress?.ToString();
+
+            return $"ip:{ipAddress ?? "unknown"}";
         }
     }
 }

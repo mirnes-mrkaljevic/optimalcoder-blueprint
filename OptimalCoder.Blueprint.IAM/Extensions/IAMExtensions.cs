@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using OptimalCoder.Blueprint.DB.Entities;
 using OptimalCoder.Blueprint.IAM.Authentication;
 using OptimalCoder.Blueprint.Shared.Config;
 using System;
@@ -14,6 +16,8 @@ namespace OptimalCoder.Blueprint.IAM.Extensions
         public static IServiceCollection AddIAMServices(this IServiceCollection services)
         {
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+            services.AddScoped<IPasswordService, PasswordService>();
 
             return services;
         }

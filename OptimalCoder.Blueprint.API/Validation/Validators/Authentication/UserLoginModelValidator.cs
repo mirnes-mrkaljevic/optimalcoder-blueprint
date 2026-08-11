@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using OptimalCoder.Blueprint.IAM.Authentication;
+using OptimalCoder.Blueprint.IAM.Authentication.Model;
 
 namespace OptimalCoder.Blueprint.API.Validation.Validators.Authentication
 {

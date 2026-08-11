@@ -1,4 +1,4 @@
-﻿namespace OptimalCoder.Blueprint.IAM.Authentication
+﻿namespace OptimalCoder.Blueprint.IAM.Authentication.Model
 {
     public class UserLoginModel
     {
