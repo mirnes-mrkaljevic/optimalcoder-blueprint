@@ -17,14 +17,10 @@ namespace OptimalCoder.Blueprint.DB.Migrations
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("UserName").AsString().Unique()
                 .WithColumn("PasswordHash").AsString()
-                .WithColumn("PasswordSalt").AsString()
-                .WithColumn("AuthToken").AsString(1024).Nullable()
-                .WithColumn("RefreshToken").AsString(1024).Nullable()
+                .WithColumn("RefreshTokenHash").AsString(1024).Nullable()
                 .WithColumn("RefreshTokenExpiryTime").AsDateTime().Nullable()
-                .WithColumn("SignInBy").AsString().Nullable()
                 .WithColumn("EmailConfirmed").AsBoolean()
-                .WithColumn("Locked").AsBoolean()
-                .WithColumn("CompanyId").AsInt32().Nullable();
+                .WithColumn("Locked").AsBoolean();
 
             Create.Table("Role")
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()

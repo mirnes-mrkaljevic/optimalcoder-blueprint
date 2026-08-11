@@ -17,8 +17,6 @@ namespace OptimalCoder.Blueprint.V10.Controllers
         public IEnumerable<dynamic> Get()
         {
 
-            throw new ApplicationException("d fsdf sdf sdf dsf");
-
             return Enumerable.Range(1, 5).Select(index => new 
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
