@@ -19,7 +19,7 @@ The blueprint demonstrates how to structure an application around clear responsi
 * Rate limiting
 * Dependency injection through module extensions
 * Unit tests
-* Domain, infrastructure, and shared modules
+* Business, infrastructure, and shared modules
 
 ## Solution structure
 
@@ -28,7 +28,7 @@ OptimalCoder.Blueprint/
 ├── OptimalCoder.Blueprint.API/
 ├── OptimalCoder.Blueprint.DB/
 ├── OptimalCoder.Blueprint.DB.Migrations/
-├── OptimalCoder.Blueprint.Domain/
+├── OptimalCoder.Blueprint.Business/
 ├── OptimalCoder.Blueprint.IAM/
 ├── OptimalCoder.Blueprint.Infra/
 ├── OptimalCoder.Blueprint.Shared/
