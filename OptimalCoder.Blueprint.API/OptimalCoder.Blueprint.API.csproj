@@ -15,11 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OptimalCoder.Blueprint.Business\OptimalCoder.Blueprint.Business.csproj" />
     <ProjectReference Include="..\OptimalCoder.Blueprint.DB.Migrations\OptimalCoder.Blueprint.DB.Migrations.csproj" />
     <ProjectReference Include="..\OptimalCoder.Blueprint.DB\OptimalCoder.Blueprint.DB.csproj" />
     <ProjectReference Include="..\OptimalCoder.Blueprint.IAM\OptimalCoder.Blueprint.IAM.csproj" />
     <ProjectReference Include="..\OptimalCoder.Blueprint.Infrastructure\OptimalCoder.Blueprint.Infra.csproj" />
-    <ProjectReference Include="..\OptimalCoder.Blueprint.Services\OptimalCoder.Blueprint.Domain.csproj" />
     <ProjectReference Include="..\OptimalCoder.Blueprint.Shared\OptimalCoder.Blueprint.Shared.csproj" />
   </ItemGroup>
 
