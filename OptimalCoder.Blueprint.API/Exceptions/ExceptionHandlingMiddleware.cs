@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using OptimalCoder.Blueprint.IAM.Authentication;
 using OptimalCoder.Blueprint.Infra.Logger;
 using OptimalCoder.Blueprint.Shared.Exceptions;
@@ -30,7 +31,7 @@ namespace OptimalCoder.Blueprint.API.Exceptions
 
         private async Task HandleExceptionAsync(HttpContext context, IOptimalLogger logger, Exception ex)
         {
-            ErrorResponse response;
+            ProblemDetails response;
 
             switch (ex)
             {
@@ -52,21 +53,19 @@ namespace OptimalCoder.Blueprint.API.Exceptions
 
             }
            
-            context.Response.StatusCode = response.Status;
+            context.Response.StatusCode = response.Status.GetValueOrDefault();
             context.Response.ContentType = "application/json";
 
             await context.Response.WriteAsJsonAsync(response);
         }
 
-        private static ErrorResponse CreateErrorResponse(int status, string code, string message)
+        private static ProblemDetails CreateErrorResponse(int status, string code, string message)
         {
-            return new ErrorResponse
+            return new ProblemDetails
             {
                 Status = status,
-                Success = false,
-                Code = code,
-                Message = message
-        
+                Detail = message,
+                Title = code
             };
         }
     }

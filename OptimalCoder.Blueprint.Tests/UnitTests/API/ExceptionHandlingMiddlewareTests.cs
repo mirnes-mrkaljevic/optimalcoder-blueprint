@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using OptimalCoder.Blueprint.API.Exceptions;
@@ -67,12 +68,11 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.API
             using var reader = new StreamReader(context.Response.Body);
             var response = await reader.ReadToEndAsync();
 
-            var errorResponse = new ErrorResponse
+            var errorResponse = new ProblemDetails
             {
                 Status = returnStatus,
-                Success = false,
-                Code = code,
-                Message = message
+                Title = code,
+                Detail = message
             };
 
             var errorResponseJson = JsonSerializer.Serialize(
