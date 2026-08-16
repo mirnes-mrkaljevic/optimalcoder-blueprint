@@ -24,7 +24,7 @@ namespace OptimalCoder.Blueprint.DB.Migrations
                         SELECT u.Id, r.Id
                         FROM [User] u
                         CROSS JOIN [Role] r
-                        WHERE u.UserName = 'admin'
+                        WHERE u.UserName = 'optimalcoderdemo'
                           AND r.Name = 'Admin';
                     ");
         }
