@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OptimalCoder.Blueprint.DB.Entities;
 using OptimalCoder.Blueprint.IAM.Authentication;
 using OptimalCoder.Blueprint.IAM.Authentication.Model;
 
@@ -25,7 +24,7 @@ namespace OptimalCoder.Blueprint.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("Login")]
-        public IActionResult Login([FromBody] UserLoginModel user)
+        public async Task<IActionResult> Login([FromBody] UserLoginModel user)
         {
             var validation = _loginModelValidator.Validate(user);
             if (!validation.IsValid)
@@ -33,13 +32,13 @@ namespace OptimalCoder.Blueprint.API.Controllers
                 throw new ValidationException(validation.Errors);
             }
 
-            var tokenModel = _service.Login(user);
+            var tokenModel = await _service.Login(user);
             return Ok(new { TokenModel = tokenModel });
         }
 
         [AllowAnonymous]
         [HttpPost("RefreshToken")]
-        public IActionResult RefreshToken([FromBody] TokenRequest request)
+        public async Task<IActionResult> RefreshToken([FromBody] TokenRequest request)
         {
             var validation = _tokenModelValidator.Validate(request);
 
@@ -48,22 +47,23 @@ namespace OptimalCoder.Blueprint.API.Controllers
                 throw new ValidationException(validation.Errors);
             }
 
-            var tokenResponse = _service.RefreshToken(request);
+            var tokenResponse = await _service.RefreshToken(request);
 
             return Ok(tokenResponse);
         }
 
         [Authorize]
         [HttpPost("Logout")]
-        public IActionResult Logout([FromBody] TokenRequest tokenModel)
+        public async Task<IActionResult> Logout([FromBody] TokenRequest tokenModel)
         {
             var validation = _tokenModelValidator.Validate(tokenModel);
+
             if (!validation.IsValid)
             {
                 throw new ValidationException(validation.Errors);
             }
 
-            var success = _service.Logout(User.Identity?.Name!, tokenModel);
+            var success = await _service.Logout(User.Identity?.Name!, tokenModel);
 
             return Ok(success);
         }

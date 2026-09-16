@@ -14,9 +14,9 @@ namespace OptimalCoder.Blueprint.IAM.Authentication
 {
     public interface IAuthenticationService
     {
-        TokenResponse Login(UserLoginModel user);
-        TokenResponse RefreshToken(TokenRequest request);
-        bool Logout(string username, TokenRequest request);
+        Task<TokenResponse> Login(UserLoginModel user);
+        Task<TokenResponse> RefreshToken(TokenRequest request);
+        Task<bool> Logout(string username, TokenRequest request);
     }
 
     public class AuthenticationService : IAuthenticationService
@@ -25,7 +25,7 @@ namespace OptimalCoder.Blueprint.IAM.Authentication
         private readonly IPasswordService _passwordService;
         private readonly Jwt _jwtConfig;
 
-        public AuthenticationService(UserDbContext userDbContext, IPasswordService passwordService, IOptions<AppSettings> appSettings)
+        public AuthenticationService(UserDbContext userDbContext, IPasswordService passwordService,  IOptions<AppSettings> appSettings)
         {
             _userDbContext = userDbContext;
             _passwordService = passwordService;
@@ -33,9 +33,10 @@ namespace OptimalCoder.Blueprint.IAM.Authentication
         }
 
 
-        public TokenResponse Login(UserLoginModel model)
+        public async Task<TokenResponse> Login(UserLoginModel model)
         {
-            var user = _userDbContext.User.Include(u => u.Roles).FirstOrDefault(x => x.UserName == model.UserName);
+            var user = await _userDbContext.User.Include(u => u.Roles).FirstOrDefaultAsync(x => x.UserName == model.UserName);
+            
             if (user == null)
             {
                 throw new UnauthorizedException("INVALID_CREDENTIALS", "Invalid username or password.");
@@ -59,7 +60,7 @@ namespace OptimalCoder.Blueprint.IAM.Authentication
             user.RefreshTokenHash = HashRefreshToken(refreshToken);
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenValidityInDays);
 
-            _userDbContext.SaveChanges();
+            await _userDbContext.SaveChangesAsync();
 
             return new TokenResponse
             {
@@ -69,11 +70,11 @@ namespace OptimalCoder.Blueprint.IAM.Authentication
 
         }
 
-        public TokenResponse RefreshToken(TokenRequest request)
+        public async Task<TokenResponse> RefreshToken(TokenRequest request)
         {
             var refreshTokenHash = HashRefreshToken(request.RefreshToken);
 
-            var user = _userDbContext.User.Include(x => x.Roles).FirstOrDefault(x => x.RefreshTokenHash == refreshTokenHash);
+            var user = await _userDbContext.User.Include(x => x.Roles).FirstOrDefaultAsync(x => x.RefreshTokenHash == refreshTokenHash);
 
             if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
@@ -87,7 +88,7 @@ namespace OptimalCoder.Blueprint.IAM.Authentication
 
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtConfig.RefreshTokenValidityInDays);
 
-            _userDbContext.SaveChanges();
+            await _userDbContext.SaveChangesAsync();
 
             return new TokenResponse
             {
@@ -96,11 +97,11 @@ namespace OptimalCoder.Blueprint.IAM.Authentication
             };
         }
 
-        public bool Logout(string username, TokenRequest request)
+        public async Task<bool> Logout(string username, TokenRequest request)
         {
             var refreshTokenHash = HashRefreshToken(request.RefreshToken);
 
-            var user = _userDbContext.User.FirstOrDefault(x => x.UserName == username &&
+            var user = await _userDbContext.User.FirstOrDefaultAsync(x => x.UserName == username &&
                 x.RefreshTokenHash == refreshTokenHash);
 
             if (user == null)
@@ -111,7 +112,7 @@ namespace OptimalCoder.Blueprint.IAM.Authentication
             user.RefreshTokenHash = null;
             user.RefreshTokenExpiryTime = null;
 
-            _userDbContext.SaveChanges();
+            await _userDbContext.SaveChangesAsync();
 
             return true;
         }

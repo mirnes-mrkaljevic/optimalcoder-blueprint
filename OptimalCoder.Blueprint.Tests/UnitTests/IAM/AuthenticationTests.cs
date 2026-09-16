@@ -59,11 +59,11 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
         }
 
         [Test]
-        public void Login_WhenEmailNotConfirmed_ThrowEx()
+        public async Task Login_WhenEmailNotConfirmed_ThrowEx()
         {
             _user.EmailConfirmed = false;
 
-            var ex = Assert.Throws<UnauthorizedException>(() => _authService.Login(new UserLoginModel()
+            var ex = Assert.ThrowsAsync<UnauthorizedException>(async () => await _authService.Login(new UserLoginModel()
             {
                 UserName = "UserName",
                 Password = "password"
@@ -73,11 +73,11 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
         }
 
         [Test]
-        public void Login_WhenDifferentPasswordHash_ThrowEx()
+        public async Task Login_WhenDifferentPasswordHash_ThrowEx()
         {
             _passwordServiceMock.Setup(x => x.Hash(_user, "password")).Returns("wrong password hash");
 
-            var ex = Assert.Throws<UnauthorizedException>(() => _authService.Login(new UserLoginModel()
+            var ex = Assert.ThrowsAsync<UnauthorizedException>(async () => await _authService.Login(new UserLoginModel()
             {
                 UserName = _user.UserName,
                 Password = "password"
@@ -86,24 +86,25 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
         }
 
         [Test]
-        public void RefreshAuthToken_WhenExpired_ThrowEx()
+        public async Task RefreshAuthToken_WhenExpired_ThrowEx()
         {
             _user.RefreshTokenExpiryTime = DateTime.UtcNow.AddSeconds(-1);
-            var ex = Assert.Throws<UnauthorizedException>(() => _authService.RefreshToken(new TokenRequest()
+            var ex = Assert.ThrowsAsync<UnauthorizedException>(async() => await _authService.RefreshToken(new TokenRequest()
             {
                 RefreshToken = "refresh token"
             }))!;
+
             Assert.AreEqual("REFRESH_TOKEN_FAILED", ex.Code);
         }
 
         [Test]
-        public void RefreshAuthToken_WhenSucess_ToReturnNewToken()
+        public async Task RefreshAuthToken_WhenSucess_ToReturnNewToken()
         {
             var refreshToken = "refreshToken";
             var hash = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
             _user.RefreshTokenHash = Convert.ToBase64String(hash);
 
-            var newToken =  _authService.RefreshToken(new TokenRequest()
+            var newToken =  await _authService.RefreshToken(new TokenRequest()
             {
                 RefreshToken = refreshToken
             });
@@ -114,13 +115,13 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
         }
 
         [Test]
-        public void Logout_WhenSucess_ToReturnTrue()
+        public async Task Logout_WhenSucess_ToReturnTrue()
         {
             var refreshToken = "refreshToken";
             var hash = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
             _user.RefreshTokenHash = Convert.ToBase64String(hash);
 
-            var result = _authService.Logout(_user.UserName, new TokenRequest()
+            var result = await _authService.Logout(_user.UserName, new TokenRequest()
             {
                 RefreshToken = refreshToken
             });
