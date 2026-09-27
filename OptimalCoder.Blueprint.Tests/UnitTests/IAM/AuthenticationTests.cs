@@ -86,6 +86,22 @@ namespace OptimalCoder.Blueprint.Tests.UnitTests.IAM
         }
 
         [Test]
+        public async Task Login_WhenUSernamePasswordOk_ReturnTokens()
+        {
+            _passwordServiceMock.Setup(x => x.Verify(_user, "password", "PasswordHash")).Returns(true);
+
+            var tokens = await _authService.Login(new UserLoginModel()
+            {
+                UserName = _user.UserName,
+                Password = "password"
+            });
+
+            Assert.IsNotNull(tokens);
+            Assert.IsNotEmpty(tokens.AuthToken);
+            Assert.IsNotEmpty(tokens.RefreshToken);
+        }
+
+        [Test]
         public async Task RefreshAuthToken_WhenExpired_ThrowEx()
         {
             _user.RefreshTokenExpiryTime = DateTime.UtcNow.AddSeconds(-1);
