@@ -11,7 +11,7 @@ namespace OptimalCoder.Blueprint.API.Validation.Validators.Authentication
                 .NotNull()
                 .NotEmpty()
                 .MinimumLength(6)
-                .Matches("^[a-zA-Z0-9_]+$");
+                .EmailAddress();
 
             RuleFor(x => x.Password)
                 .NotNull()

@@ -63,7 +63,7 @@ flow can be tested immediately.
 
 > **Development credentials only**
 >
-> Username: `optimalcoderdemo`
+> Username: `demo@optimalcoder.net`
 > Password: `Optimalcoderdemo1!`
 
 Do not use these credentials in a deployed environment. Change or remove the
